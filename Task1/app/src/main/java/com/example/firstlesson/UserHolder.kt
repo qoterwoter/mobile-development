@@ -52,6 +52,9 @@ object UserHolder {
             it.accessCode = code
             it.sendAccessCodeToUser(phone, code)
         }
+        //достаем пользователя по "чистому" телефону
+        //генерируем AccessCode
+        //отправляем код
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
