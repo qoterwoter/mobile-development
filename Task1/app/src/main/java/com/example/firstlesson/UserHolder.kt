@@ -1,6 +1,7 @@
 package com.example.firstlesson.app.src.main.java.com.example.firstlesson
 
 import androidx.annotation.VisibleForTesting
+import app.src.main.java.com.example.firstlesson.User
 import com.example.firstlesson.User
 
 object UserHolder {
@@ -32,15 +33,25 @@ object UserHolder {
 
 
     fun registerUserByPhone(fullName: String, rawPhone: String): User {
+        User.makeUser(fullName, phone = rawPhone)
+                .also { user ->
+                    if (map.containsKey(user.phone)) throw IllegalArgumentException("This number is used")
+                    if (cleanPhone(rawPhone).matches(phoneFormat)) map[user.login] = user
+                    else throw IllegalArgumentException("Number entered incorrectly")
+                }
         //создаем пользователя через фабрику
         //должна быть проверка на то, что пользователь есть
         //должна быть проверка на валидность формата номера телефона
     }
 
     fun requestAccessCode(login: String) {
-        //достаем пользователя по "чистому" телефону
-        //генерируем AccessCode
-        //отправляем код
+        val phone: String = cleanPhone(login)
+        map[phone]?.let {
+            val code: String = it.generateAccessCode()
+            it.passwordHash = it.encrypt(code)
+            it.accessCode = code
+            it.sendAccessCodeToUser(phone, code)
+        }
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
